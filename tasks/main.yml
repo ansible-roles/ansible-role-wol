@@ -1,0 +1,24 @@
+---
+
+- name: WOL | Check if enabled
+  shell: >
+    ethtool {{ wol_interface }} | grep 'Wake-on' | tail -1 | awk '{print substr($0,length,1)}'
+  register: wol_enabled
+
+- name: WOL | Current status is
+  debug:
+    msg: "Current status is: {{ wol_enabled.stdout }}"
+
+- name: WOL | Set new status if it not proper
+  shell: >
+    ethtool -s {{ wol_interface }} wol {{ wol_status }}
+  when: "wol_status != wol_enabled.stdout"
+
+- name: WOL | Get remote MAC address to send magic packet to it
+  shell: >
+    ip addr show | grep -A1 'eth0: ' | grep 'link/ether' | awk '{print substr($0, 16, 17)}'
+  register: wol_mac
+
+- name: WOL | Remote MAC address is
+  debug:
+    msg: "Use 'wakeonlan {{ wol_mac.stdout }}'"
