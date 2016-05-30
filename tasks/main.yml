@@ -16,7 +16,7 @@
 
 - name: WOL | Get remote MAC address to send magic packet to it
   shell: >
-    ip addr show | grep -A1 'eth0: ' | grep 'link/ether' | awk '{print substr($0, 16, 17)}'
+    ip addr show | grep -A1 '{{ wol_interface }}: ' | grep 'link/ether' | awk '{print substr($0, 16, 17)}'
   register: wol_mac
 
 - name: WOL | Remote MAC address is
